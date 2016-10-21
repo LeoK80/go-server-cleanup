@@ -9,3 +9,5 @@ By default it will chuck anything older than 180 days. Optionally on the bash co
 
 By default it will always keep at least 15 of your last builds.
 Also nothing will get deleted in a pipeline if there is 15 builds or less.
+
+**tip: set it up to execute periodically as a cron job and you'll have a lot less worries about go-server disk space issues**
