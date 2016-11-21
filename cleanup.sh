@@ -34,21 +34,30 @@ do
       #evaluate build count in each iteration
       if [ $buildsCount -gt 15 ]; then
 
-        fileChanged=$(stat -c %z $directory)
+        fileChanged=$(stat -c %y $directory)
         days=$(datediff)
 
         if [ ${days} -gt ${daysInput} ]; then
-          rm -r $directory
-          echo $directory "is deleted, it was "$days " days old"
-         #update build count after deleting 1
-         buildsCount=$(( $buildsCount - 1 ))
+
+            if [ "$(pwd)" = "${basedir}/${pipeline}" ]; then
+                rm -r $directory
+                echo $directory "is deleted, it was "$days " days old"
+                #update build count after deleting 1
+                buildsCount=$(( $buildsCount - 1 ))
+            else
+                echo "not in the correct direcotry, aborting job"
+                exit
+            fi
+
        fi
      else
        echo "15 builds or less left in this pipeline, not deleting anymore"
+       break
      fi
    done
   else
    echo "15 builds or less in pipeline, not deleting anything"
   fi
+# pop back up one level into ../pipelines before cd'ing into the next pipeline in the loop
  cd ..
 done
