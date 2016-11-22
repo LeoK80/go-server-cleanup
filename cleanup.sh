@@ -13,11 +13,21 @@ buildsToKeep=15
 
 if [ -n "$3" ]; then
     if [ \( "$3" = "-r" \) -o \( "$3" = "-R" \) ]; then
+      if [[ $4 =~ ^[0-9]+$ ]]; then
         echo "setting retention to ${4} days"
         daysInput=$4
+      else
+        echo 'input for retention needs to be a number'
+        exit
+      fi
     elif [ \( "$3" = "-b" \) -o \( "$3" = "-B" \) ]; then
+      if [[ $4 =~ ^[0-9]+$ ]]; then
         echo "setting minimum builds to keep to ${4} builds"
         buildsToKeep=$4
+      else
+        echo 'input for builds to keep needs to be a number'
+        exit
+      fi
     else
         echo "3: invalid input, please use -h option for help"
         exit
@@ -39,6 +49,7 @@ if [ -n "$1" ]; then
         daysInput=$2
       else
         echo 'input for retention needs to be a number'
+        exit
       fi
     elif [ \( "$1" = "-b" \) -o \( "$1" = "-B" \) ]; then
       if [[ $2 =~ ^[0-9]+$ ]]; then
@@ -46,6 +57,7 @@ if [ -n "$1" ]; then
         buildsToKeep=$2
       else
         echo 'input for builds to keep needs to be a number'
+        exit
       fi
     else
         echo "1: invalid input, please use -h option for help"
