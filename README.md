@@ -1,4 +1,5 @@
 # go-server-cleanup
+This script is aimed at admins using Thoughtworks GO continuous delivery tool https://www.go.cd/. I'm not affiliated to them in any way, just one of the many users through profession of the CI platform.
 
 run the script from the machine where your go-server is installed.
 
