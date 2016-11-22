@@ -6,13 +6,57 @@ datediff() {
     echo $(( (d1 - d2) / 86400 ))
 }
 
-today=$(date -d 'now')
-daysInput=$1
+today=$(date)
 
-if [ -z $daysInput ];then
-  daysInput=180
-  echo "set default 180 days retention"
+daysInput=180
+buildsToKeep=15
+
+if [ -n "$3" ]; then
+    if [ \( "$3" = "-r" \) -o \( "$3" = "-R" \) ]; then
+        echo "setting retention to ${4} days"
+        daysInput=$4
+    elif [ \( "$3" = "-b" \) -o \( "$3" = "-B" \) ]; then
+        echo "setting minimum builds to keep to ${4} builds"
+        buildsToKeep=$4
+    else
+        echo "3: invalid input, please use -h option for help"
+        exit
+    fi
 fi
+
+if [ -n "$1" ]; then
+    if [ "$1" = "-h" ]; then
+      echo "use without parameters to run with default parameters, 180 days retention and minimum of 15 builds to keep"
+      echo "-r      retention, set amount of days retention"
+      echo "-b      builds, set minimum amount of builds to keep"
+      echo "example use: ./cleanup.sh -r 90 -b 10"
+      echo "this will cleanup any builds older than 90 days but won't delete anything when there is"
+      echo "10 builds or less from a pipeline"
+      exit
+    elif [ \( "$1" = "-r" \) -o \( "$1" = "-R" \) ]; then
+      if [[ $2 =~ ^[0-9]+$ ]]; then
+        echo "setting retention to ${2} days"
+        daysInput=$2
+      else
+        echo 'input for retention needs to be a number'
+      fi
+    elif [ \( "$1" = "-b" \) -o \( "$1" = "-B" \) ]; then
+      if [[ $2 =~ ^[0-9]+$ ]]; then
+        echo "setting minimum builds to keep to ${2} builds"
+        buildsToKeep=$2
+      else
+        echo 'input for builds to keep needs to be a number'
+      fi
+    else
+        echo "1: invalid input, please use -h option for help"
+        exit
+    fi
+else
+    echo "setting defaults: 180 days retention, minimum of 15 builds to keep"
+fi
+
+echo "starting script with ${daysInput} days retention"
+echo "won't delete any pipelines if there is ${buildsToKeep} builds or less (left) in a pipeline."
 
 basedir="/var/lib/go-server/artifacts/pipelines"
 cd "${basedir}"
@@ -41,7 +85,7 @@ do
 
             if [ "$(pwd)" = "${basedir}/${pipeline}" ]; then
                 rm -r $directory
-                echo $directory "is deleted, it was "$days " days old"
+                echo $directory "is deleted, it was " $days " days old"
                 #update build count after deleting 1
                 buildsCount=$(( $buildsCount - 1 ))
             else
