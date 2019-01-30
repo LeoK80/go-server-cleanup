@@ -84,11 +84,11 @@ do
 
   allBuilds=$(ls -lart | awk '{if($9 > "0") print $9}')
   #only start if there is more than 15 builds in the pipeline
-  if [ $buildsCount -gt 15 ]; then
+  if [ $buildsCount -gt $buildsToKeep ]; then
     for directory in $allBuilds;
     do
       #evaluate build count in each iteration
-      if [ $buildsCount -gt 15 ]; then
+      if [ $buildsCount -gt $buildsToKeep ]; then
 
         fileChanged=$(stat -c %y $directory)
         days=$(datediff)
@@ -101,18 +101,18 @@ do
                 #update build count after deleting 1
                 buildsCount=$(( $buildsCount - 1 ))
             else
-                echo "not in the correct direcotry, aborting job"
+                echo "not in the correct directory, aborting job"
                 exit
             fi
 
        fi
      else
-       echo "15 builds or less left in this pipeline, not deleting anymore"
+       echo "${buildsToKeep} builds or less left in this pipeline, not deleting anymore"
        break
      fi
    done
   else
-   echo "15 builds or less in pipeline, not deleting anything"
+   echo "${buildsToKeep} builds or less in the pipeline, not deleting anything"
   fi
 # pop back up one level into ../pipelines before cd'ing into the next pipeline in the loop
  cd ..
